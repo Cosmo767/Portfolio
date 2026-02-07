@@ -112,27 +112,36 @@ ax3 = plt.subplot(3, 2, 3)
 plt.plot(x_z, y_z, 'k-', linewidth=2)
 plt.fill_between(x_z, y_z, alpha=0.1, color='gray')
 
-# Shade p-value area (two-tailed)
-x_p_left = x_z[x_z < -abs(z_stat)]
-x_p_right = x_z[x_z > abs(z_stat)]
-plt.fill_between(x_p_left, stats.norm.pdf(x_p_left), alpha=0.6, color='red', 
+# Shade p-value area (two-tailed) - vertical regions beyond z-statistic
+x_p_left = x_z[x_z <= -abs(z_stat)]
+x_p_right = x_z[x_z >= abs(z_stat)]
+plt.fill_between(x_p_left, 0, stats.norm.pdf(x_p_left), alpha=0.6, color='red', 
                  label=f'P-value = {p_value:.4f}')
-plt.fill_between(x_p_right, stats.norm.pdf(x_p_right), alpha=0.6, color='red')
+plt.fill_between(x_p_right, 0, stats.norm.pdf(x_p_right), alpha=0.6, color='red')
 
-plt.axvline(z_stat, color='green', linewidth=2, linestyle='--')
-plt.axvline(-z_stat, color='green', linewidth=2, linestyle='--')
+# Mark the z-statistic locations
+plt.axvline(z_stat, color='green', linewidth=3, linestyle='--', 
+            label=f'Z = ±{abs(z_stat):.2f}')
+plt.axvline(-z_stat, color='green', linewidth=3, linestyle='--')
+
+# Add arrows pointing to shaded regions
+plt.annotate('', xy=(-abs(z_stat), 0.2), xytext=(0, 0.2),
+            arrowprops=dict(arrowstyle='->', color='red', lw=2))
+plt.annotate('', xy=(abs(z_stat), 0.2), xytext=(0, 0.2),
+            arrowprops=dict(arrowstyle='->', color='red', lw=2))
+plt.text(0, 0.22, 'Extreme values', ha='center', fontsize=9, color='red')
 
 # Add text annotation
 result_text = "SIGNIFICANT" if p_value < 0.05 else "NOT SIGNIFICANT"
 color = "green" if p_value < 0.05 else "red"
-plt.text(0, max(y_z) * 0.8, f'{result_text}\n(p < 0.05)' if p_value < 0.05 else f'{result_text}\n(p ≥ 0.05)', 
+plt.text(0, max(y_z) * 0.7, f'{result_text}\n(p < 0.05)' if p_value < 0.05 else f'{result_text}\n(p ≥ 0.05)', 
          ha='center', fontsize=12, fontweight='bold', color=color,
          bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
 
 plt.xlabel('Z-score', fontsize=11)
 plt.ylabel('Probability Density', fontsize=11)
 plt.title('P-Value: Probability of Observing This Result by Chance', fontsize=13, fontweight='bold')
-plt.legend(fontsize=10)
+plt.legend(fontsize=10, loc='upper left')
 plt.grid(True, alpha=0.3)
 
 # ============================================================================
@@ -283,9 +292,14 @@ ax.text(0, max(y_simple) * 0.5,
 # What is p-value?
 ax = axes[0, 1]
 ax.plot(x_simple, y_simple, 'k-', linewidth=2)
-x_shade = x_simple[np.abs(x_simple) > abs(z_stat)]
-ax.fill_between(x_shade, stats.norm.pdf(x_shade), alpha=0.5, color='red', 
+# Shade the tails beyond the z-statistic (vertical regions)
+x_shade_left = x_simple[x_simple <= -abs(z_stat)]
+x_shade_right = x_simple[x_simple >= abs(z_stat)]
+ax.fill_between(x_shade_left, 0, stats.norm.pdf(x_shade_left), alpha=0.5, color='red')
+ax.fill_between(x_shade_right, 0, stats.norm.pdf(x_shade_right), alpha=0.5, color='red', 
                 label=f'P-value area = {p_value:.4f}')
+ax.axvline(z_stat, color='green', linewidth=2, linestyle='--', label=f'Z = ±{abs(z_stat):.2f}')
+ax.axvline(-z_stat, color='green', linewidth=2, linestyle='--')
 ax.set_title('What is a P-Value?', fontsize=14, fontweight='bold')
 ax.set_xlabel('Z-score')
 ax.set_ylabel('Probability')
