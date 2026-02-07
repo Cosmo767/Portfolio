@@ -386,6 +386,7 @@
                 <li><a href="#when">When to Use It</a></li>
                 <li><a href="#sample-size">Sample Size Calculator</a></li>
                 <li><a href="#significance">Significance Checker</a></li>
+                <li><a href="#statistics">Statistical Breakdown</a></li>
                 <li><a href="#pitfalls">Common Pitfalls</a></li>
                 <li><a href="#best-practices">Best Practices</a></li>
             </ul>
@@ -620,6 +621,27 @@
         </section>
 
         <!-- Common Pitfalls -->
+        <!-- Statistical Breakdown -->
+<section id="statistics" class="tutorial-section">
+    <h2>Statistical Mechanics Explained</h2>
+    <p>
+        The calculators above use a <strong>two-proportion z-test</strong>. Here's a visual breakdown of what's happening under the hood:
+    </p>
+
+    <h3>Simple Explanation</h3>
+    <img src="ab_test_explained.png" alt="A/B Testing Explained" 
+         style="width: 100%; border-radius: 15px; margin: 2rem 0; box-shadow: var(--shadow);">
+
+    <h3>Detailed Statistical Breakdown</h3>
+    <img src="ab_test_statistical_breakdown.png" alt="Statistical Breakdown" 
+         style="width: 100%; border-radius: 15px; margin: 2rem 0; box-shadow: var(--shadow);">
+
+    <div class="info-box">
+        <strong>Want to generate these for your own data?</strong>
+        Download the <code>ab_test_visualizations.py</code> script from the GitHub repo, update the data at the top, and run it to create custom visualizations!
+    </div>
+</section>
+        
         <section id="pitfalls" class="tutorial-section">
             <h2>Common Pitfalls to Avoid</h2>
 
