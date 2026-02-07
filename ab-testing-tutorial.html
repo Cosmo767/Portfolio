@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A/B Testing Interactive Tutorial - Data Science Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Additional styles specific to tutorial */
+        .tutorial-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tutorial-nav {
+            position: fixed;
+            top: 80px;
+            right: 2rem;
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            max-width: 200px;
+        }
+
+        .tutorial-nav h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .tutorial-nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tutorial-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .tutorial-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.3s ease;
+        }
+
+        .tutorial-nav a:hover {
+            color: #667eea;
+        }
+
+        .tutorial-section {
+            background: var(--bg-card);
+            padding: 2.5rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .tutorial-section h2 {
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .tutorial-section h3 {
+            color: var(--text-primary);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .tutorial-section p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .calculator-card {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .calc-button {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+        }
+
+        .calc-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-box h4 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-value {
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .visualization {
+            width: 100%;
+            height: 400px;
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 100%;
+            padding: 2rem;
+        }
+
+        .bar {
+            flex: 1;
+            margin: 0 1rem;
+            background: linear-gradient(to top, #667eea, #764ba2);
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            transition: all 0.5s ease;
+            min-height: 20px;
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-primary);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1.5rem 0;
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1.5rem 0;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .example-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .example-table th,
+        .example-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .example-table th {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .example-table td {
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: 0.4s;
+            border-radius: 30px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background: var(--primary-gradient);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        @media (max-width: 768px) {
+            .tutorial-nav {
+                position: static;
+                max-width: 100%;
+                margin-bottom: 2rem;
+            }
+
+            .tutorial-container {
+                padding: 1rem;
+            }
+
+            .tutorial-section {
+                padding: 1.5rem;
+            }
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            transition: gap 0.3s ease;
+        }
+
+        .back-link:hover {
+            gap: 1rem;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="tutorial-container">
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Portfolio
+        </a>
+
+        <h1 style="font-size: 3rem; margin-bottom: 1rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            A/B Testing: An Interactive Guide
+        </h1>
+        <p style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 3rem;">
+            Learn how to design, run, and analyze A/B tests with interactive calculators and real-world examples.
+        </p>
+
+        <!-- Navigation -->
+        <div class="tutorial-nav">
+            <h3>Contents</h3>
+            <ul>
+                <li><a href="#intro">What is A/B Testing?</a></li>
+                <li><a href="#when">When to Use It</a></li>
+                <li><a href="#sample-size">Sample Size Calculator</a></li>
+                <li><a href="#significance">Significance Checker</a></li>
+                <li><a href="#pitfalls">Common Pitfalls</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+            </ul>
+        </div>
+
+        <!-- Introduction -->
+        <section id="intro" class="tutorial-section">
+            <h2>What is A/B Testing?</h2>
+            <p>
+                A/B testing (also called split testing) is a method of comparing two versions of something to determine which performs better. You show version A to one group of users and version B to another group, then measure which version achieves your goal more effectively.
+            </p>
+
+            <div class="info-box">
+                <strong>Real-World Example:</strong>
+                An e-commerce company wants to know if changing their "Buy Now" button from blue to green increases purchases. They randomly show 50% of visitors the blue button (Control) and 50% the green button (Variant), then compare conversion rates.
+            </div>
+
+            <div class="visualization">
+                <div class="bar-chart">
+                    <div class="bar" id="controlBar" style="height: 45%;">
+                        <span class="bar-value">4.5%</span>
+                        <span class="bar-label">Control (Blue Button)</span>
+                    </div>
+                    <div class="bar" id="variantBar" style="height: 52%;">
+                        <span class="bar-value">5.2%</span>
+                        <span class="bar-label">Variant (Green Button)</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Key Components</h3>
+            <table class="example-table">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Control (A)</strong></td>
+                        <td>The current version (baseline)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Variant (B)</strong></td>
+                        <td>The new version you're testing</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Metric</strong></td>
+                        <td>What you're measuring (conversion rate, clicks, revenue, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sample Size</strong></td>
+                        <td>Number of users in each group</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Statistical Significance</strong></td>
+                        <td>Confidence that results aren't due to chance (usually 95%)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- When to Use -->
+        <section id="when" class="tutorial-section">
+            <h2>When Should You Run an A/B Test?</h2>
+            
+            <h3>✅ Good Use Cases</h3>
+            <ul style="color: var(--text-secondary); line-height: 2;">
+                <li>Testing different button colors, sizes, or copy</li>
+                <li>Comparing two email subject lines</li>
+                <li>Evaluating different page layouts</li>
+                <li>Testing pricing strategies</li>
+                <li>Optimizing checkout flows</li>
+            </ul>
+
+            <h3>❌ When NOT to A/B Test</h3>
+            <ul style="color: var(--text-secondary); line-height: 2;">
+                <li>Not enough traffic (need sufficient sample size)</li>
+                <li>Testing completely different products (use separate launches)</li>
+                <li>When stakeholders have already decided (testing should inform decisions)</li>
+                <li>Testing too many variables at once (causes statistical issues)</li>
+            </ul>
+
+            <div class="warning-box">
+                <strong>⚠️ Minimum Traffic Required:</strong>
+                You typically need at least 1,000 visitors per variant to detect meaningful differences. With lower traffic, tests take too long or can't reach statistical significance.
+            </div>
+        </section>
+
+        <!-- Sample Size Calculator -->
+        <section id="sample-size" class="tutorial-section">
+            <h2>Sample Size Calculator</h2>
+            <p>
+                Before running a test, calculate how many visitors you need in each group. This ensures your test can detect meaningful differences and reach statistical significance.
+            </p>
+
+            <div class="calculator-card">
+                <h3 style="margin-top: 0;">Calculate Required Sample Size</h3>
+                
+                <div class="input-group">
+                    <label for="baseline">Baseline Conversion Rate (%):</label>
+                    <input type="number" id="baseline" placeholder="e.g., 5" step="0.1" value="5">
+                    <small style="color: var(--text-secondary);">Your current conversion rate</small>
+                </div>
+
+                <div class="input-group">
+                    <label for="mde">Minimum Detectable Effect (%):</label>
+                    <input type="number" id="mde" placeholder="e.g., 10" step="0.1" value="10">
+                    <small style="color: var(--text-secondary);">Smallest improvement you want to detect (e.g., 10% means 5% → 5.5%)</small>
+                </div>
+
+                <div class="input-group">
+                    <label for="confidence">Confidence Level:</label>
+                    <select id="confidence">
+                        <option value="90">90%</option>
+                        <option value="95" selected>95% (Recommended)</option>
+                        <option value="99">99%</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="power">Statistical Power:</label>
+                    <select id="power">
+                        <option value="70">70%</option>
+                        <option value="80" selected>80% (Recommended)</option>
+                        <option value="90">90%</option>
+                    </select>
+                    <small style="color: var(--text-secondary);">Probability of detecting an effect if it exists</small>
+                </div>
+
+                <button class="calc-button" onclick="calculateSampleSize()">Calculate Sample Size</button>
+
+                <div id="sampleSizeResult" class="result-box">
+                    <h4>Results</h4>
+                    <div class="result-item">
+                        <span>Sample Size Per Variant:</span>
+                        <span class="result-value" id="samplePerVariant">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Total Sample Size:</span>
+                        <span class="result-value" id="totalSample">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Expected Variant Conversion:</span>
+                        <span class="result-value" id="expectedConversion">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Estimated Test Duration:</span>
+                        <span class="result-value" id="testDuration">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>How to use these results:</strong>
+                If you have 1,000 visitors/day and need 15,000 per variant (30,000 total), your test will take about 30 days. If that's too long, consider testing a more dramatic change (higher MDE) or accept lower confidence/power.
+            </div>
+        </section>
+
+        <!-- Significance Calculator -->
+        <section id="significance" class="tutorial-section">
+            <h2>Statistical Significance Checker</h2>
+            <p>
+                After running your test, use this calculator to determine if your results are statistically significant or just due to random chance.
+            </p>
+
+            <div class="calculator-card">
+                <h3 style="margin-top: 0;">Check Your Test Results</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Control (A)</h4>
+                        <div class="input-group">
+                            <label for="controlVisitors">Visitors:</label>
+                            <input type="number" id="controlVisitors" placeholder="e.g., 10000" value="10000">
+                        </div>
+                        <div class="input-group">
+                            <label for="controlConversions">Conversions:</label>
+                            <input type="number" id="controlConversions" placeholder="e.g., 500" value="500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Variant (B)</h4>
+                        <div class="input-group">
+                            <label for="variantVisitors">Visitors:</label>
+                            <input type="number" id="variantVisitors" placeholder="e.g., 10000" value="10000">
+                        </div>
+                        <div class="input-group">
+                            <label for="variantConversions">Conversions:</label>
+                            <input type="number" id="variantConversions" placeholder="e.g., 580" value="580">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="calc-button" onclick="calculateSignificance()">Calculate Significance</button>
+
+                <div id="significanceResult" class="result-box">
+                    <h4>Test Results</h4>
+                    <div class="result-item">
+                        <span>Control Conversion Rate:</span>
+                        <span class="result-value" id="controlRate">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Variant Conversion Rate:</span>
+                        <span class="result-value" id="variantRate">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Relative Improvement:</span>
+                        <span class="result-value" id="relativeImprovement">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span>P-Value:</span>
+                        <span class="result-value" id="pValue">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Confidence Level:</span>
+                        <span class="result-value" id="confidenceLevel">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Result:</span>
+                        <span class="result-value" id="conclusion">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>Interpreting P-Values:</strong>
+                A p-value < 0.05 means there's less than a 5% chance your results are due to random variation. This is considered statistically significant. The lower the p-value, the stronger the evidence.
+            </div>
+        </section>
+
+        <!-- Common Pitfalls -->
+        <section id="pitfalls" class="tutorial-section">
+            <h2>Common Pitfalls to Avoid</h2>
+
+            <h3>1. Stopping Tests Too Early</h3>
+            <p>
+                "Peeking" at results and stopping when you see significance leads to false positives. Always run tests for the pre-calculated duration.
+            </p>
+            <div class="warning-box">
+                <strong>Example:</strong> You calculate you need 10,000 visitors per variant. On day 3, you have 3,000 visitors and see the variant is winning with p < 0.05. If you stop now, there's a high chance this is a false positive. Wait for 10,000.
+            </div>
+
+            <h3>2. Testing Too Many Things at Once</h3>
+            <p>
+                Testing multiple changes simultaneously makes it impossible to know what caused the difference. Test one variable at a time.
+            </p>
+
+            <h3>3. Not Accounting for Seasonality</h3>
+            <p>
+                Running tests during holidays, sales events, or other special periods can skew results. Ensure your test runs through at least one full business cycle.
+            </p>
+
+            <h3>4. Ignoring Statistical Power</h3>
+            <p>
+                Low statistical power means you might miss real improvements. Always calculate required sample size before starting.
+            </p>
+
+            <h3>5. Not Randomizing Properly</h3>
+            <p>
+                Ensure users are randomly assigned to groups. Don't let users choose their variant or assign based on non-random factors.
+            </p>
+        </section>
+
+        <!-- Best Practices -->
+        <section id="best-practices" class="tutorial-section">
+            <h2>Best Practices Checklist</h2>
+
+            <div style="background: var(--bg-secondary); padding: 2rem; border-radius: 15px;">
+                <h3 style="margin-top: 0;">Before the Test</h3>
+                <ul style="color: var(--text-secondary); line-height: 2;">
+                    <li>☐ Define clear hypothesis and success metric</li>
+                    <li>☐ Calculate required sample size</li>
+                    <li>☐ Set significance level (usually 95%)</li>
+                    <li>☐ Ensure proper randomization</li>
+                    <li>☐ Test only one variable</li>
+                </ul>
+
+                <h3>During the Test</h3>
+                <ul style="color: var(--text-secondary); line-height: 2;">
+                    <li>☐ Don't peek at results early</li>
+                    <li>☐ Monitor for implementation bugs</li>
+                    <li>☐ Ensure traffic is split evenly</li>
+                    <li>☐ Run for full calculated duration</li>
+                </ul>
+
+                <h3>After the Test</h3>
+                <ul style="color: var(--text-secondary); line-height: 2;">
+                    <li>☐ Calculate statistical significance</li>
+                    <li>☐ Consider practical significance (is the improvement meaningful?)</li>
+                    <li>☐ Document results and learnings</li>
+                    <li>☐ Roll out winner to 100% of users</li>
+                    <li>☐ Monitor for long-term effects</li>
+                </ul>
+            </div>
+
+            <div class="info-box" style="margin-top: 2rem;">
+                <strong>Pro Tip:</strong>
+                Keep a testing log with all your hypotheses, results, and learnings. Failed tests are just as valuable as winners – they tell you what doesn't work and prevent others from testing the same thing.
+            </div>
+        </section>
+
+        <!-- Python Code Example -->
+        <section class="tutorial-section">
+            <h2>Bonus: Python Code for A/B Testing</h2>
+            <p>Here's how to run these calculations in Python:</p>
+
+            <div class="code-block">
+from scipy import stats
+import numpy as np
+
+# Sample Size Calculation
+def calculate_sample_size(baseline_rate, mde, alpha=0.05, power=0.8):
+    """Calculate required sample size per variant"""
+    p1 = baseline_rate
+    p2 = baseline_rate * (1 + mde)
+    
+    # Z-scores for alpha and power
+    z_alpha = stats.norm.ppf(1 - alpha/2)
+    z_beta = stats.norm.ppf(power)
+    
+    # Pooled probability
+    p_pooled = (p1 + p2) / 2
+    
+    # Sample size formula
+    n = (2 * p_pooled * (1 - p_pooled) * (z_alpha + z_beta)**2) / (p1 - p2)**2
+    
+    return int(np.ceil(n))
+
+# Statistical Significance Test
+def ab_test_significance(control_visitors, control_conversions, 
+                         variant_visitors, variant_conversions):
+    """Perform two-proportion z-test"""
+    
+    # Calculate conversion rates
+    p1 = control_conversions / control_visitors
+    p2 = variant_conversions / variant_visitors
+    
+    # Pooled proportion
+    p_pooled = (control_conversions + variant_conversions) / (control_visitors + variant_visitors)
+    
+    # Standard error
+    se = np.sqrt(p_pooled * (1 - p_pooled) * (1/control_visitors + 1/variant_visitors))
+    
+    # Z-statistic
+    z_stat = (p2 - p1) / se
+    
+    # P-value (two-tailed)
+    p_value = 2 * (1 - stats.norm.cdf(abs(z_stat)))
+    
+    return {
+        'control_rate': p1,
+        'variant_rate': p2,
+        'improvement': (p2 - p1) / p1,
+        'p_value': p_value,
+        'significant': p_value < 0.05
+    }
+
+# Example usage
+sample_size = calculate_sample_size(0.05, 0.10)
+print(f"Required sample size: {sample_size} per variant")
+
+results = ab_test_significance(10000, 500, 10000, 580)
+print(f"Control rate: {results['control_rate']:.2%}")
+print(f"Variant rate: {results['variant_rate']:.2%}")
+print(f"Improvement: {results['improvement']:.2%}")
+print(f"P-value: {results['p_value']:.4f}")
+print(f"Significant: {results['significant']}")
+            </div>
+        </section>
+
+        <div style="text-align: center; margin-top: 3rem; padding: 2rem;">
+            <a href="index.html" class="calc-button" style="display: inline-block; width: auto; padding: 1rem 3rem;">
+                ← Back to Portfolio
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        // Sample Size Calculator
+        function calculateSampleSize() {
+            const baseline = parseFloat(document.getElementById('baseline').value) / 100;
+            const mde = parseFloat(document.getElementById('mde').value) / 100;
+            const confidence = parseInt(document.getElementById('confidence').value);
+            const power = parseInt(document.getElementById('power').value) / 100;
+            
+            if (!baseline || !mde) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // Calculate expected variant rate
+            const p1 = baseline;
+            const p2 = baseline * (1 + mde);
+            
+            // Z-scores
+            const alpha = (100 - confidence) / 100;
+            const zAlpha = getZScore(1 - alpha/2);
+            const zBeta = getZScore(power);
+            
+            // Pooled probability
+            const pPooled = (p1 + p2) / 2;
+            
+            // Sample size formula
+            const n = (2 * pPooled * (1 - pPooled) * Math.pow(zAlpha + zBeta, 2)) / Math.pow(p2 - p1, 2);
+            const samplePerVariant = Math.ceil(n);
+            const totalSample = samplePerVariant * 2;
+            
+            // Estimate duration (assuming 1000 visitors/day)
+            const duration = Math.ceil(totalSample / 1000);
+            
+            // Display results
+            document.getElementById('samplePerVariant').textContent = samplePerVariant.toLocaleString();
+            document.getElementById('totalSample').textContent = totalSample.toLocaleString();
+            document.getElementById('expectedConversion').textContent = (p2 * 100).toFixed(2) + '%';
+            document.getElementById('testDuration').textContent = duration + ' days*';
+            document.getElementById('sampleSizeResult').classList.add('show');
+        }
+
+        // Statistical Significance Calculator
+        function calculateSignificance() {
+            const controlVisitors = parseInt(document.getElementById('controlVisitors').value);
+            const controlConversions = parseInt(document.getElementById('controlConversions').value);
+            const variantVisitors = parseInt(document.getElementById('variantVisitors').value);
+            const variantConversions = parseInt(document.getElementById('variantConversions').value);
+            
+            if (!controlVisitors || !controlConversions || !variantVisitors || !variantConversions) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // Calculate rates
+            const p1 = controlConversions / controlVisitors;
+            const p2 = variantConversions / variantVisitors;
+            
+            // Pooled proportion
+            const pPooled = (controlConversions + variantConversions) / (controlVisitors + variantVisitors);
+            
+            // Standard error
+            const se = Math.sqrt(pPooled * (1 - pPooled) * (1/controlVisitors + 1/variantVisitors));
+            
+            // Z-statistic
+            const zStat = (p2 - p1) / se;
+            
+            // P-value (two-tailed)
+            const pValue = 2 * (1 - normalCDF(Math.abs(zStat)));
+            
+            // Confidence level
+            const confidenceLevel = ((1 - pValue) * 100).toFixed(1);
+            
+            // Relative improvement
+            const improvement = ((p2 - p1) / p1 * 100).toFixed(2);
+            
+            // Conclusion
+            let conclusion = pValue < 0.05 ? '✓ Significant!' : '✗ Not Significant';
+            if (pValue < 0.01) conclusion = '✓✓ Highly Significant!';
+            
+            // Display results
+            document.getElementById('controlRate').textContent = (p1 * 100).toFixed(2) + '%';
+            document.getElementById('variantRate').textContent = (p2 * 100).toFixed(2) + '%';
+            document.getElementById('relativeImprovement').textContent = improvement + '%';
+            document.getElementById('pValue').textContent = pValue.toFixed(4);
+            document.getElementById('confidenceLevel').textContent = confidenceLevel + '%';
+            document.getElementById('conclusion').textContent = conclusion;
+            document.getElementById('significanceResult').classList.add('show');
+        }
+
+        // Helper function: approximate z-score
+        function getZScore(p) {
+            // Approximation using inverse normal CDF
+            if (p === 0.5) return 0;
+            if (p < 0.5) return -getZScore(1 - p);
+            
+            const t = Math.sqrt(-2 * Math.log(1 - p));
+            const c0 = 2.515517;
+            const c1 = 0.802853;
+            const c2 = 0.010328;
+            const d1 = 1.432788;
+            const d2 = 0.189269;
+            const d3 = 0.001308;
+            
+            return t - (c0 + c1*t + c2*t*t) / (1 + d1*t + d2*t*t + d3*t*t*t);
+        }
+
+        // Helper function: normal CDF
+        function normalCDF(x) {
+            const t = 1 / (1 + 0.2316419 * Math.abs(x));
+            const d = 0.3989423 * Math.exp(-x * x / 2);
+            const prob = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+            return x > 0 ? 1 - prob : prob;
+        }
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
